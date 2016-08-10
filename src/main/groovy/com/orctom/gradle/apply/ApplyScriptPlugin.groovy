@@ -26,13 +26,15 @@ class ApplyScriptPlugin implements Plugin<Project> {
                 def dependency = scriptIds[0]
                 def script = scriptIds[1]
                 Dependency dep = project.getDependencies().add(CONFIGURATION_SCRIPTS, dependency)
-                scriptSet.add(getScriptPath(project, dep, script))
+                project.apply (from: getScriptPath(project, dep, script) )
+                //scriptSet.add(getScriptPath(project, dep, script))
             } else {
-                scriptSet.add("${project.buildDir}/scripts/${scriptId}")
+                project.apply (from: "${project.buildDir}/scripts/${scriptId}")
+                //scriptSet.add("${project.buildDir}/scripts/${scriptId}")
             }
         }
 
-        project.afterEvaluate {
+        project.beforeEvaluate {
             scriptsDependencies.resolve().each { jarFile ->
                 def jar = project.zipTree(jarFile)
                 def scriptFolder = project.file(getScriptFolderPath(project, jarFile))
@@ -45,9 +47,9 @@ class ApplyScriptPlugin implements Plugin<Project> {
                 }
             }
 
-            scriptSet.each {
-                project.apply ( from: it )
-            }
+            // scriptSet.each {
+            //     project.apply ( from: it )
+            // }
         }
     }
 
